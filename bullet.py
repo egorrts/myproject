@@ -5,7 +5,7 @@ class Bullet(pygame.sprite.Sprite):
         '''создае  пулю в текущей позиции пушки'''
         super(Bullet, self).__init__()
         self.screen = screen
-        self.rect = pygame.Rect(0, 0, 250, 12)  #координаты пули, ширина, высота
+        self.rect = pygame.Rect(0, 0, 5, 12)  #координаты пули, ширина, высота
         self.color = 139, 195, 74
         self.speed = 8
         self.rect.centerx = gun.rect.centerx #пуля появляется в верхней части пушки
