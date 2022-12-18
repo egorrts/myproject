@@ -12,13 +12,16 @@ class Gun():
         self.rect.bottom = self.screen_rect.bottom
         self.mright = False  #false пока не нажали на клавишу
         self.mleft = False
-    def output(self):
+    def draw(self):
         '''рисование пушки'''
         self.screen.blit(self.image, self.rect)   #отрисооваем пушку как объект(прямоугольник)
     def update_gun(self):
         '''обновление позиции пушки'''
         if self.mright == True and self.rect.right < self.screen_rect.right:
-            self.rect.centerx += 4
+            self.rect.centerx += 2
         elif self.mleft == True and self.rect.left > self.screen_rect.left:
-            self.rect.centerx -= 4
+            self.rect.centerx -= 2
+    def create_gun(self):
+        '''размещает пушку по центру внизу'''
+        self.center = self.screen_rect.centerx
 

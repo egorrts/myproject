@@ -4,7 +4,9 @@ from spacegun import Gun
 from pygame.sprite import Group
 from bullet import Bullet
 from alien import Ino
-def events(screen, gun, bullets):
+from stats import Stats
+import time
+def handle_events(screen, gun, bullets):
     '''обработка событий'''
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # закрываем игру по желанию пользователя
@@ -22,7 +24,7 @@ def events(screen, gun, bullets):
                 gun.mright = False
             if event.key == pygame.K_a:
                 gun.mleft = False
-def update_bullets(inos, bullets):
+def update_bullets(screen, inos, bullets):
     '''бновляет позиции пуль'''
     '''метод pygame groupcollide перебирает группы пуль и пришельцев и если они пересекаются(сталкиваются), добавляет их в словарь '''
     bullets.update()
@@ -30,11 +32,34 @@ def update_bullets(inos, bullets):
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)   #удаляем из контейнера bullets пулю, если выходит за пределы экр
     collisions = pygame.sprite.groupcollide(bullets, inos, True, True)  #оба аргумента true удаляют и пулю и пришельца
-def update_inos(gun, inos):
+    if len(inos) == 0:
+        bullets.empty()
+        create_army(screen, inos)
+def gun_kill(stats, screen, gun, inos, bullets):
+    '''столкновение пушки и армии'''
+    if stats.guns_left > 0:
+        stats.guns_left -= 1
+        inos.empty()
+        bullets.empty()
+        create_army(screen, inos)
+        gun.create_gun()
+        time.sleep(1)
+    else:
+        stats.run_game = False
+        sys.exit()
+def update_inos(stats, screen, gun, inos, bullets):
     '''обновляет позицию пришельцев'''
     inos.update()
-    if pygame.sprite.spritecollideany(gun, inos):  #проверяем столкновение пушки и пришельца
-        pygame.QUIT
+    if pygame.sprite.spritecollideany(gun, inos):  #проверяем столкновение пушки и пришельца с помощью метода colledeany
+        gun_kill(stats, screen, gun, inos, bullets)
+    inos_check(stats, screen, gun, inos, bullets)
+def inos_check(stats, screen, gun, inos, bullets):
+    '''проверка, добралась ли армия до края экрана'''
+    screen_rect = screen.get_rect()
+    for ino in inos.sprites():
+        if ino.rect.bottom >= screen_rect.bottom:
+            gun_kill(stats, screen, gun, inos, bullets)
+            break
 def create_army(screen, inos):
     '''создание армии пришельцев'''
     ino = Ino(screen)
@@ -63,17 +88,19 @@ def run():
     bullets = Group()
     inos = Group()
     create_army(screen, inos)
+    stats = Stats()
 
     while True:
         '''основной цикл программы'''
-        events(screen, gun, bullets)
-        gun.update_gun()
-        screen.fill(displ_color)  # метод fill-заливка фона
-        for bullet in bullets.sprites():  # рисуем пули до пушки, чтобы пушка была сверху
-            bullet.draw_bullet()
-        gun.output()
-        inos.draw(screen)
-        pygame.display.flip()       #создаем финальный экран после окончания игры
-        update_bullets(inos, bullets)
-        update_inos(gun, inos)
+        handle_events(screen, gun, bullets)
+        if stats.run_game:
+            gun.update_gun()
+            screen.fill(displ_color)
+            for bullet in bullets.sprites():
+                bullet.draw()
+            gun.draw()
+            inos.draw(screen)
+            pygame.display.flip()       #создаем финальный экран после окончания игры
+            update_bullets(screen, inos, bullets)
+            update_inos(stats, screen, gun, inos, bullets)
 run()
