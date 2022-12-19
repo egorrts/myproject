@@ -1,6 +1,8 @@
 import pygame
-class Gun():
+from pygame.sprite import Sprite
+class Gun(Sprite):
     def __init__(self, screen):    #инициализация пушки
+        super(Gun, self).__init__()
         self.screen = screen     #получаем экран
         self.image = pygame.image.load('images/pixil-frame-0.png')   #загружаем картинку
         '''получаем поверхность графического объекта(экрана) и поверхность самой картинки, чтобы потом их нарисовать
