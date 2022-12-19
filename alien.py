@@ -1,5 +1,6 @@
 import pygame
 
+
 class Ino(pygame.sprite.Sprite):
     '''класс одного пришельца'''
     def __init__(self, screen):
